@@ -14,3 +14,12 @@ pipe() {
   [ "$2" ] && until [ "${1% 0}" = "$1" ]; do set -- "${1% 0}"; done
   return "${1##* }"
 } 4>&1
+
+igpipe() {
+  case $- in
+    *e*) set +e; (set -e; "$@"); set -e -- $? ;;
+    *) ("$@"); set -- $? ;;
+  esac
+  [ "$1" -ge 128 ] || return "$1"
+  [ "$(kill -l "$1")" = PIPE ] || return "$1"
+}
