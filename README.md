@@ -8,6 +8,7 @@ To our delight, `pipefail` has been standardized in POSIX and implemented in all
 - All POSIX shells supported
   - sh, bash, ksh, zsh, etc.
 - Shortest code possible
+- Extra: Function to ignore `SIGPIPE` (`igpipe`)
 
 Note: The Bourne shell is not supported because it is legacy, not POSIX compliant, and no longer used.
 
@@ -21,7 +22,7 @@ This replaces the old FAQ (How do I get the exit code of cmd1 in cmd1|cmd2) on c
 Use it as:
 
 ```sh
-# From  
+# From
 cmd1 | cmd2 | cmd3
 
 # To
@@ -60,3 +61,15 @@ pipe 'echo $((1 | 2)) | tr 3 C'
 pipe 'echo $((1|2)) | tr 3 C'
 ```
 
+## Function to ignore SIGPIPE
+
+When you enable `pipefail`, you will probably be plagued by `SIGPIPE`. The `igpipe` function is for ignoring `SIGPIPE`.
+
+```sh
+set -o pipefail
+seq 100000 | cat | head >/dev/null
+echo $? # => 141
+
+igpipe seq 100000 | igpipe cat | head >/dev/null
+echo $? # => 0
+```
